@@ -1,7 +1,8 @@
 import express from "express";
 import { registerUser, loginUser } from "../services/userservice.js";
 import { verifyToken } from "../middleware/authMiddleware.js";
-import { getAllCourses } from "../services/courseservice.js"; // kalau mau tes proteksi endpoint
+import { getAllCourses } from "../services/courseservice.js";
+import { verifyEmail } from "../services/userservice.js";
 
 const router = express.Router();
 
@@ -89,6 +90,19 @@ router.get("/protected-courses", verifyToken, async (req, res) => {
       message: "Terjadi kesalahan di server",
       error: err.message,
     });
+  }
+});
+
+// verifikasi email
+router.get("/verify-email", async (req, res) => {
+  try {
+    const { token } = req.query;
+    if (!token) throw new Error("Token tidak ditemukan");
+
+    const result = await verifyEmail(token);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(400).json({ status: 400, message: err.message });
   }
 });
 

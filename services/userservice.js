@@ -1,40 +1,17 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { v4 as uuidv4 } from "uuid";
-import nodemailer from "nodemailer";
 import { db } from "../config/db.js";
+import { sendVerificationEmail } from "./mailservice.js";
 
 export async function registerUser(fullname, username, password, email) {
-  // Enkripsi password
+  // enkripsi password
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // buat verification email
-  async function sendVerificationEmail(email, token) {
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
-
-    const verificationUrl = `http://localhost:8080/verify-email?token=${token}`;
-
-    const mailOptions = {
-      from: `"EduCourse" <${process.env.SMTP_USER}>`,
-      to: email,
-      subject: "Verifikasi Email EduCourse",
-      html: `<p>Silakan klik link berikut untuk verifikasi email:</p>
-           <a href="${verificationUrl}">Verifikasi Email</a>`,
-    };
-
-    await transporter.sendMail(mailOptions);
-  }
-
+  // buat token verifikasi
   const verificationToken = uuidv4();
-  // Simpan ke database
+
+  // simpan user + token
   const [result] = await db.query(
     `INSERT INTO user (fullname, username, password, email, verification_token)
      VALUES (?, ?, ?, ?, ?)`,
@@ -52,29 +29,27 @@ export async function registerUser(fullname, username, password, email) {
   };
 }
 
+// login
 export async function loginUser(email, password) {
-  // search user by email
   const [rows] = await db.query("SELECT * FROM user WHERE email = ?", [email]);
   const user = rows[0];
 
-  if (!user) {
-    throw new Error("Email atau password salah!");
+  if (!user) throw new Error("Email atau password salah!");
+
+  // cek apakah sudah verifikasi email
+  if (user.is_verified === 0) {
+    throw new Error("Email belum diverifikasi!");
   }
 
-  //  password
   const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) {
-    throw new Error("Email atau password salah!");
-  }
+  if (!isMatch) throw new Error("Email atau password salah!");
 
-  // make JWT token
   const token = jwt.sign(
     { id_user: user.id_user, email: user.email },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRES }
   );
 
-  // Return hasil
   return {
     message: "Login berhasil!",
     token,
@@ -85,4 +60,23 @@ export async function loginUser(email, password) {
       email: user.email,
     },
   };
+}
+
+// verifikasi email
+export async function verifyEmail(token) {
+  const [rows] = await db.query(
+    "SELECT * FROM user WHERE verification_token = ?",
+    [token]
+  );
+
+  if (rows.length === 0) {
+    throw new Error("Invalid Verification Token");
+  }
+
+  await db.query(
+    "UPDATE user SET is_verified = 1, verification_token = NULL WHERE verification_token = ?",
+    [token]
+  );
+
+  return { status: 200, message: "Email Verified Successfully" };
 }
