@@ -2,7 +2,16 @@ import { db } from "../config/db.js";
 
 // semua course
 export async function getAllCourses(filters = {}) {
-  const { category, sort, order, search } = filters;
+  const {
+    categoryId,
+    categoryName,
+    category,
+    sort,
+    order,
+    search,
+    minPrice,
+    maxPrice,
+  } = filters;
 
   let query = `
     SELECT 
@@ -22,26 +31,45 @@ export async function getAllCourses(filters = {}) {
   const conditions = [];
   const values = [];
 
-  // === FILTER ===
+  // FILTER
   if (category) {
     conditions.push("course.id_kategori = ?");
     values.push(category);
   }
 
-  // === SEARCH ===
+  if (categoryId) {
+    conditions.push("kategori_kelas.id_kategori = ?");
+    values.push(categoryId);
+  }
+
+  if (categoryName) {
+    conditions.push("kategori_kelas.nama_kategori LIKE ?");
+    values.push(`%${categoryName}%`);
+  }
+
+  if (minPrice !== undefined) {
+    conditions.push("course.harga >= ?");
+    values.push(Number(minPrice));
+  }
+
+  if (maxPrice !== undefined) {
+    conditions.push("course.harga <= ?");
+    values.push(Number(maxPrice));
+  }
+
+  // SEARCH
   if (search) {
     conditions.push("course.nama_kelas LIKE ?");
     values.push(`%${search}%`);
   }
 
-  // Tambahkan WHERE jika ada kondisi
   if (conditions.length > 0) {
     query += " WHERE " + conditions.join(" AND ");
   }
 
-  // === SORT ===
+  // SORT
   if (sort) {
-    const validSort = ["nama_kelas", "harga", "id"]; // hanya kolom aman
+    const validSort = ["nama_kelas", "harga", "id"];
     if (validSort.includes(sort)) {
       query += ` ORDER BY course.${sort} ${order === "desc" ? "DESC" : "ASC"}`;
     }
@@ -50,27 +78,12 @@ export async function getAllCourses(filters = {}) {
   const [rows] = await db.query(query, values);
   return rows;
 }
-// course by id and nama
-if (categoryId) {
-  query += " AND kategori_kelas.id_kategori = ?";
-  values.push(categoryId);
-}
 
-if (categoryName) {
-  query += " AND kategori_kelas.nama_kategori LIKE ?";
-  values.push(`%${categoryName}%`);
+// course by id
+export async function getcourse(id) {
+  const [rows] = await db.query("SELECT * FROM course WHERE id = ?", [id]);
+  return rows[0];
 }
-
-if (minPrice) {
-  query += " AND course.harga >= ?";
-  values.push(Number(minPrice));
-}
-
-if (maxPrice) {
-  query += " AND course.harga <= ?";
-  values.push(Number(maxPrice));
-}
-
 // buat course
 export async function createcourses(
   id_tutor,
