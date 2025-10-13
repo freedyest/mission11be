@@ -4,7 +4,7 @@ export async function sendVerificationEmail(email, token) {
   const transporter = nodemailer.createTransport({
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
-    secure: false, // true jika port 465
+    secure: false,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS, // gunakan App Password Gmail
