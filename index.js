@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import courseRouter from "./routes/courseroute.js";
+import userRoutes from "./routes/userroute.js";
 
 dotenv.config();
 const app = express();
@@ -8,6 +9,7 @@ app.use(express.json());
 
 // pasang router
 app.use("/course", courseRouter);
+app.use("/", userRoutes);
 
 // error handler
 app.use((err, req, res, next) => {
