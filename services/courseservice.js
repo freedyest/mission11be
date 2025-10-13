@@ -1,29 +1,74 @@
 import { db } from "../config/db.js";
 
 // semua course
-export async function getAllCourses() {
-  const [rows] = await db.query(`
+export async function getAllCourses(filters = {}) {
+  const { category, sort, order, search } = filters;
+
+  let query = `
     SELECT 
-  course.id,
-  course.nama_kelas,
-  course.deskripsi,
-  course.harga,
-  tutor.nama_tutor,
-  tutor.pekerjaan_tutor,
-  tutor.tempat_kerja,
-  kategori_kelas.nama_kategori
-FROM course
-JOIN tutor ON course.id_tutor = tutor.id_tutor
-JOIN kategori_kelas ON course.id_kategori = kategori_kelas.id_kategori
+      course.id,
+      course.nama_kelas,
+      course.deskripsi,
+      course.harga,
+      tutor.nama_tutor,
+      tutor.pekerjaan_tutor,
+      tutor.tempat_kerja,
+      kategori_kelas.nama_kategori
+    FROM course
+    JOIN tutor ON course.id_tutor = tutor.id_tutor
+    JOIN kategori_kelas ON course.id_kategori = kategori_kelas.id_kategori
+  `;
 
-  `);
+  const conditions = [];
+  const values = [];
 
+  // === FILTER ===
+  if (category) {
+    conditions.push("course.id_kategori = ?");
+    values.push(category);
+  }
+
+  // === SEARCH ===
+  if (search) {
+    conditions.push("course.nama_kelas LIKE ?");
+    values.push(`%${search}%`);
+  }
+
+  // Tambahkan WHERE jika ada kondisi
+  if (conditions.length > 0) {
+    query += " WHERE " + conditions.join(" AND ");
+  }
+
+  // === SORT ===
+  if (sort) {
+    const validSort = ["nama_kelas", "harga", "id"]; // hanya kolom aman
+    if (validSort.includes(sort)) {
+      query += ` ORDER BY course.${sort} ${order === "desc" ? "DESC" : "ASC"}`;
+    }
+  }
+
+  const [rows] = await db.query(query, values);
   return rows;
 }
-// course by id
-export async function getcourse(id) {
-  const [rows] = await db.query("SELECT * FROM course WHERE id = ?", [id]);
-  return rows[0];
+// course by id and nama
+if (categoryId) {
+  query += " AND kategori_kelas.id_kategori = ?";
+  values.push(categoryId);
+}
+
+if (categoryName) {
+  query += " AND kategori_kelas.nama_kategori LIKE ?";
+  values.push(`%${categoryName}%`);
+}
+
+if (minPrice) {
+  query += " AND course.harga >= ?";
+  values.push(Number(minPrice));
+}
+
+if (maxPrice) {
+  query += " AND course.harga <= ?";
+  values.push(Number(maxPrice));
 }
 
 // buat course

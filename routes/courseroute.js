@@ -7,20 +7,31 @@ import {
   patchCourse,
   deletecourse,
 } from "../services/courseservice.js";
+import { verifyToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
-//all course
+
+// 🔒 Semua route di bawah ini butuh token
+router.use(verifyToken);
+
+// GET all courses
 router.get("/", async (req, res) => {
-  const courses = await getAllCourses();
-  res.json(courses);
+  try {
+    const courses = await getAllCourses(req.query);
+    res.json(courses);
+  } catch (err) {
+    console.error("❌ ERROR getAllCourses:", err);
+    res.status(500).json({ error: err.message });
+  }
 });
-//course by id
+// GET course by id
 router.get("/:id", async (req, res) => {
   const id = req.params.id;
   const course = await getcourse(id);
   res.json(course);
 });
-//create course
+
+// CREATE course
 router.post("/", async (req, res) => {
   try {
     const { id_tutor, id_kategori, nama_kelas, deskripsi, harga } = req.body;
@@ -42,7 +53,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-//update put course
+// UPDATE (PUT)
 router.put("/:id", async (req, res) => {
   try {
     const id = req.params.id;
@@ -64,30 +75,22 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-//update patch course
+// PATCH (update sebagian)
 router.patch("/:id", async (req, res) => {
   try {
     const id = req.params.id;
-    const data = req.body; // bisa berisi { nama_kelas, deskripsi, harga, id_kategori, id_tutor }
-
-    const course = await patchCourse(id, data); // kirim objek data langsung
-
+    const data = req.body;
+    const course = await patchCourse(id, data);
     res
       .status(200)
       .json({ message: "✅ Course berhasil diupdate!", data: course });
   } catch (err) {
-    if (
-      err.message === "Course tidak ditemukan" ||
-      err.message === "Tutor tidak ditemukan" ||
-      err.message === "Kategori tidak ditemukan"
-    ) {
-      return res.status(404).json({ error: err.message });
-    }
     console.error("❌ ERROR di PATCH /courses/:id:", err);
     res.status(500).json({ error: err.message });
   }
 });
-//delete course
+
+// DELETE
 router.delete("/:id", async (req, res) => {
   const id = req.params.id;
   const course = await deletecourse(id);
@@ -95,4 +98,5 @@ router.delete("/:id", async (req, res) => {
     .status(200)
     .json({ message: "✅ Course berhasil dihapus!", data: course });
 });
+
 export default router;

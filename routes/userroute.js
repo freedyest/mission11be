@@ -1,9 +1,11 @@
 import express from "express";
 import { registerUser, loginUser } from "../services/userservice.js";
+import { verifyToken } from "../middleware/authMiddleware.js";
+import { getAllCourses } from "../services/courseservice.js"; // kalau mau tes proteksi endpoint
 
 const router = express.Router();
 
-//  REGISTER
+/* REGISTER USER*/
 router.post("/register", async (req, res) => {
   try {
     const { fullname, username, password, email } = req.body;
@@ -21,7 +23,7 @@ router.post("/register", async (req, res) => {
     // 201 — Successful creation
     res.status(201).json({
       status: 201,
-      message: " Registrasi berhasil!",
+      message: "✅ Registrasi berhasil!",
       data: newUser,
     });
   } catch (err) {
@@ -36,7 +38,7 @@ router.post("/register", async (req, res) => {
   }
 });
 
-// LOGIN
+/*  LOGIN USER */
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -65,6 +67,26 @@ router.post("/login", async (req, res) => {
     res.status(401).json({
       status: 401,
       message: "Email atau password salah!",
+      error: err.message,
+    });
+  }
+});
+
+/*  ROUTE PROTECTED*/
+router.get("/protected-courses", verifyToken, async (req, res) => {
+  try {
+    const courses = await getAllCourses();
+    res.status(200).json({
+      status: 200,
+      message: "✅ Token valid! Data course berhasil diambil.",
+      data: courses,
+      user: req.user, //  decode JWT
+    });
+  } catch (err) {
+    console.error("❌ ERROR GET COURSES:", err);
+    res.status(500).json({
+      status: 500,
+      message: "Terjadi kesalahan di server",
       error: err.message,
     });
   }
