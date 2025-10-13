@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Oct 11, 2025 at 02:53 AM
+-- Generation Time: Oct 13, 2025 at 10:29 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.0.30
 
@@ -93,6 +93,36 @@ INSERT INTO `tutor` (`id_tutor`, `nama_tutor`, `pekerjaan_tutor`, `tempat_kerja`
 (1, 'jenna ortega', 'senior accountant', 'gojek'),
 (2, 'alexander', 'senior developer', 'tokopedia');
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `user`
+--
+
+CREATE TABLE `user` (
+  `id_user` int(11) NOT NULL,
+  `fullname` varchar(255) NOT NULL,
+  `username` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `verification_token` varchar(255) DEFAULT NULL,
+  `is_verified` tinyint(1) DEFAULT 0
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `user`
+--
+
+INSERT INTO `user` (`id_user`, `fullname`, `username`, `password`, `email`, `verification_token`, `is_verified`) VALUES
+(1, 'Budi Santoso', 'budi123', '$2b$10$ZCVewRa3JV3kuqs9x/G.JeuUga6c85w7qliuyhoC0/lmcStl9ek7C', 'budi@example.com', NULL, 1),
+(2, 'fardy', 'fardy', '$2b$10$cC.lIl5lW/UKw2roI6GKhOWhrUX/BEkXlCmTTj6P6qQCThmP4OI1e', 'fardy@example.com', NULL, 1),
+(3, 'fardy', 'fredy', '$2b$10$mTK5GPysy/IxXjL.Tv/DNO3ZUvOhIzI9xkYzvE.PufjoAjwF7IDYe', 'fredy@gmail.com', NULL, 1),
+(4, 'Freedy', 'freedy123', '$2b$10$.BWgj8WrlDGXsJSe/nLDpe3aZbNk.L8WnC3uNQwpT648PkKVXNPMW', 'freedygenshin@gmail.com', NULL, 1),
+(5, 'Freedy', 'freedy123', '$2b$10$4gdFazRmAh1ZxBkEka.yS.SMS/ouX1Om22foVewtA1C3x7cNLl6a.', 'freedygenshin@gmail.com', NULL, 1),
+(6, 'Freedy', 'freedy123', '$2b$10$Ep7S2RiN/BfhaB1XrSSHXuQ1YHfh6xzicwTUEHRLzXwp.849LoTjy', 'freedyjob@gmail.com', NULL, 1),
+(7, 'Freedy', 'freedy', '$2b$10$ji4hXlEsIK/AKtkSXcAaPuskIOX/xh2zuIlZz.3AnV0QF5NkUMRh6', 'freedyjob@gmail.com', NULL, 1),
+(8, 'Freedy', 'freedy', '$2b$10$hIZEk7nxlyNHWxTOHaNadetkPDNYrqXCiMD8urRnaY/gQUmhFTizC', 'freedyjob@gmail.com', NULL, 1);
+
 --
 -- Indexes for dumped tables
 --
@@ -118,6 +148,12 @@ ALTER TABLE `tutor`
   ADD PRIMARY KEY (`id_tutor`);
 
 --
+-- Indexes for table `user`
+--
+ALTER TABLE `user`
+  ADD PRIMARY KEY (`id_user`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -138,6 +174,12 @@ ALTER TABLE `kategori_kelas`
 --
 ALTER TABLE `tutor`
   MODIFY `id_tutor` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT for table `user`
+--
+ALTER TABLE `user`
+  MODIFY `id_user` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- Constraints for dumped tables
