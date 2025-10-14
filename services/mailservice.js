@@ -7,7 +7,7 @@ export async function sendVerificationEmail(email, token) {
     secure: false,
     auth: {
       user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS, // gunakan App Password Gmail
+      pass: process.env.SMTP_PASS,
     },
   });
 

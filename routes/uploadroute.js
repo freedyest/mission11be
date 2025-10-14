@@ -3,7 +3,6 @@ import { upload } from "../services/uploadservice.js";
 
 const router = express.Router();
 
-// endpoint /upload, field file bernama "image"
 router.post("/upload", upload.single("image"), (req, res) => {
   try {
     if (!req.file) {

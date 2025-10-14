@@ -12,14 +12,14 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-// Dapatkan path folder root
+//  path folder root
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// === Serve folder upload sebagai static ===
+// Serve folder upload
 app.use("/upload", express.static(path.join(__dirname, "upload")));
 
-// Pasang router
+//  router
 app.use("/course", courseRouter);
 app.use("/", userRoutes);
 app.use("/upload", uploadRoute);
@@ -34,7 +34,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Jalankan server
+//  run server
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}!`);

@@ -8,7 +8,7 @@ export async function registerUser(fullname, username, password, email) {
   // enkripsi password
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  // buat token verifikasi
+  //  token verifikasi
   const verificationToken = uuidv4();
 
   // simpan user + token
@@ -18,7 +18,7 @@ export async function registerUser(fullname, username, password, email) {
     [fullname, username, hashedPassword, email, verificationToken]
   );
 
-  // kirim email verifikasi
+  //  email verifikasi
   await sendVerificationEmail(email, verificationToken);
 
   return {

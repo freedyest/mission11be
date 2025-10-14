@@ -1,20 +1,20 @@
 import multer from "multer";
 import path from "path";
 
-// konfigurasi storage
+//  storage config
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "upload/"); // folder tujuan
+    cb(null, "upload/"); // folder target
   },
   filename: (req, file, cb) => {
-    // memberi nama file unik agar tidak overwrite
+    // generate name
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname); // ambil ekstensi file
+    const ext = path.extname(file.originalname); //  ekstensi file
     cb(null, file.fieldname + "-" + uniqueSuffix + ext);
   },
 });
 
-// filter file hanya gambar
+// filter file  gambar
 const fileFilter = (req, file, cb) => {
   const allowedTypes = /jpeg|jpg|png|gif/;
   const ext = allowedTypes.test(path.extname(file.originalname).toLowerCase());
@@ -30,6 +30,6 @@ const fileFilter = (req, file, cb) => {
 // export middleware multer
 export const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // max 5MB
+  limits: {},
   fileFilter,
 });

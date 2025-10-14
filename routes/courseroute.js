@@ -11,7 +11,6 @@ import { verifyToken } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// 🔒 Semua route di bawah ini butuh token
 router.use(verifyToken);
 
 // GET all courses

@@ -143,7 +143,7 @@ export async function patchCourse(id, data) {
     values.push(data.harga);
   }
   if (data.id_kategori !== undefined) {
-    // cek kategori exist dulu
+    // cek kategori exist
     const [kategori] = await db.query(
       "SELECT * FROM kategori WHERE id_kategori = ?",
       [data.id_kategori]
@@ -153,7 +153,7 @@ export async function patchCourse(id, data) {
     values.push(data.id_kategori);
   }
   if (data.id_tutor !== undefined) {
-    // cek tutor exist dulu
+    // cek tutor exist
     const [tutor] = await db.query("SELECT * FROM tutor WHERE id_tutor = ?", [
       data.id_tutor,
     ]);
@@ -164,7 +164,7 @@ export async function patchCourse(id, data) {
 
   if (fields.length === 0) throw new Error("Tidak ada data untuk diupdate");
 
-  values.push(id); // untuk WHERE
+  values.push(id);
   const sql = `UPDATE course SET ${fields.join(", ")} WHERE id = ?`;
   const [result] = await db.query(sql, values);
 

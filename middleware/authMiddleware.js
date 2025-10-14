@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 export const verifyToken = (req, res, next) => {
   try {
-    // Ambil token dari header Authorization
+    //  token  header Authorization
     const authHeader = req.headers.authorization;
 
     if (!authHeader) {
@@ -12,7 +12,7 @@ export const verifyToken = (req, res, next) => {
       });
     }
 
-    // Format header biasanya: "Bearer <token>"
+    // Format header
     const token = authHeader.split(" ")[1];
 
     if (!token) {
@@ -25,10 +25,9 @@ export const verifyToken = (req, res, next) => {
     // Verifikasi token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Simpan data user hasil decode ke request (bisa dipakai di controller)
     req.user = decoded;
 
-    // lanjut ke controller
+    //  controller
     next();
   } catch (err) {
     console.error("❌ ERROR VERIFY TOKEN:", err);
